@@ -1,62 +1,13 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Next.js + HeroUI",
-  description: "Make beautiful websites regardless of your design experience.",
+  name: "Waterloo Star",
+  description:
+    "Waterloo Star is a platform for students to find and share housing requests and sublets.",
   navItems: [
     {
       label: "Home",
       href: "/",
-    },
-    {
-      label: "Docs",
-      href: "/docs",
-    },
-    {
-      label: "Pricing",
-      href: "/pricing",
-    },
-    {
-      label: "Blog",
-      href: "/blog",
-    },
-    {
-      label: "About",
-      href: "/about",
-    },
-  ],
-  navMenuItems: [
-    {
-      label: "Profile",
-      href: "/profile",
-    },
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-    },
-    {
-      label: "Projects",
-      href: "/projects",
-    },
-    {
-      label: "Team",
-      href: "/team",
-    },
-    {
-      label: "Calendar",
-      href: "/calendar",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
-    },
-    {
-      label: "Logout",
-      href: "/logout",
     },
   ],
   links: {
@@ -66,4 +17,24 @@ export const siteConfig = {
     discord: "https://discord.gg/9b6yyZKmH4",
     sponsor: "https://patreon.com/jrgarciadev",
   },
+};
+
+export const sidebarConfig = {
+  sections: [
+    {
+      title: "Housing",
+      items: [
+        {
+          label: "Housing Requests",
+          href: "/housing-request/feed",
+          description: "Find and share housing requests",
+        },
+        {
+          label: "Sublets",
+          href: "/sublet/feed",
+          description: "Find and share sublets",
+        },
+      ],
+    },
+  ],
 };
