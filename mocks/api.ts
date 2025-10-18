@@ -2,10 +2,9 @@
 
 import {
   ApiResponse,
+  ApiStatusResponse,
   PaginatedResponse,
   PaginationMeta,
-  ApiError,
-  ApiSuccess,
 } from "@/types";
 
 /**
@@ -20,6 +19,20 @@ export function createMockApiResponse<T>(data: T): ApiResponse<T> {
       timestamp: new Date().toISOString(),
       requestId: `req-${Date.now()}`,
     },
+  };
+}
+
+/**
+ * Helper: Create mock error response
+ */
+export function createMockErrorResponse(
+  code: number,
+  message: string
+): ApiResponse<never> {
+  return {
+    code,
+    success: false,
+    message,
   };
 }
 
@@ -56,71 +69,57 @@ export function createMockPaginatedResponse<T>(
 }
 
 /**
+ * Helper: Create mock ApiStatusResponse
+ */
+export function createMockStatusResponse(
+  message: string = "Operation completed successfully"
+): ApiStatusResponse {
+  return {
+    code: 200,
+    success: true,
+    message,
+  };
+}
+
+/**
  * Mock API error responses
  */
 export const mockApiErrors = {
   unauthorized: {
-    error: {
-      code: "UNAUTHORIZED",
-      message: "You must be logged in to perform this action",
-      statusCode: 401,
-    },
-  } as ApiError,
+    code: 401,
+    success: false,
+    message: "You must be logged in to perform this action",
+  } as ApiResponse<never>,
 
   forbidden: {
-    error: {
-      code: "FORBIDDEN",
-      message: "You don't have permission to access this resource",
-      statusCode: 403,
-    },
-  } as ApiError,
+    code: 403,
+    success: false,
+    message: "You don't have permission to access this resource",
+  } as ApiResponse<never>,
 
   notFound: {
-    error: {
-      code: "NOT_FOUND",
-      message: "The requested resource was not found",
-      statusCode: 404,
-    },
-  } as ApiError,
+    code: 404,
+    success: false,
+    message: "The requested resource was not found",
+  } as ApiResponse<never>,
 
   validationError: {
-    error: {
-      code: "VALIDATION_ERROR",
-      message: "Invalid input data",
-      details: {
-        username: [
-          "Username is required",
-          "Username must be at least 3 characters",
-        ],
-        email: ["Invalid email format"],
-      },
-      statusCode: 400,
-    },
-  } as ApiError,
+    code: 400,
+    success: false,
+    message: "Invalid input data. Please check your fields and try again.",
+  } as ApiResponse<never>,
 
   serverError: {
-    error: {
-      code: "INTERNAL_SERVER_ERROR",
-      message: "An unexpected error occurred. Please try again later.",
-      statusCode: 500,
-    },
-  } as ApiError,
+    code: 500,
+    success: false,
+    message: "An unexpected error occurred. Please try again later.",
+  } as ApiResponse<never>,
 
   rateLimitExceeded: {
-    error: {
-      code: "RATE_LIMIT_EXCEEDED",
-      message: "Too many requests. Please try again later.",
-      statusCode: 429,
-    },
-  } as ApiError,
-};
-
-/**
- * Mock API success responses
- */
-export const mockApiSuccess: ApiSuccess = {
-  success: true,
-  message: "Operation completed successfully",
+    code: 429,
+    success: false,
+    message: "Too many requests. Please try again later.",
+  } as ApiResponse<never>,
 };
 
 /**
@@ -153,7 +152,7 @@ export async function simulateApiCallWithError<T>(
   await delay(800);
 
   if (Math.random() < errorRate) {
-    throw new Error("Simulated API error");
+    throw createMockErrorResponse(500, "Simulated API error");
   }
 
   return data;

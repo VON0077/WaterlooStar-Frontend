@@ -6,7 +6,14 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { PostCategory, PostStatus } from "@/types";
+import { PostCategory, PostStatus, CreatePostInput } from "@/types";
+import {
+  getPosts,
+  getPostById,
+  createPost,
+  updatePost,
+  deletePost,
+} from "@/lib/api/posts";
 
 const API_BASE_URL = process.env.API_URL || "http://localhost:3001"; // Server-side env var (not exposed to client)
 
@@ -42,6 +49,7 @@ export async function createPostAction(formData: FormData) {
   // Get data from form
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
+  const images = formData.get("images") as unknown as string[];
   const category = formData.get("category") as PostCategory;
 
   // Validate
@@ -55,38 +63,14 @@ export async function createPostAction(formData: FormData) {
     redirect("/login");
   }
 
-  try {
-    // Call external backend
-    const response = await fetch(`${API_BASE_URL}/posts`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-      body: JSON.stringify({
-        title,
-        content,
-        category,
-        status: PostStatus.PUBLISHED,
-      }),
-    });
+  const data = {
+    title,
+    content,
+    category,
+    images: [],
+  } as CreatePostInput;
 
-    if (!response.ok) {
-      const error = await response.json();
-      return { error: error.message || "Failed to create post" };
-    }
-
-    const post = await response.json();
-
-    // Revalidate the feed page to show new post
-    revalidatePath(`/${category}/feed`);
-
-    // Redirect to the new post
-    redirect(`/${category}/${post.id}`);
-  } catch (error) {
-    console.error("Create post error:", error);
-    return { error: "An unexpected error occurred" };
-  }
+  const response = await createPost(data, authToken);
 }
 
 /**

@@ -6,15 +6,13 @@
 export interface PaginationParams {
   page?: number;
   pageSize?: number;
-  sortBy?: string;
-  sortOrder?: "asc" | "desc";
 }
 
 /**
  * Standard pagination metadata (in responses)
  */
 export interface PaginationMeta {
-// TODO : Needs discussion on the fields
+  // TODO : Needs discussion on the fields
   page: number;
   pageSize: number;
   totalPages: number;
@@ -44,36 +42,30 @@ export interface ApiResponse<T> {
   success: boolean;
   message?: string;
   meta?: Record<string, any>;
-  data: T;
+  data?: T;
 }
 
 /**
  * API error response
  */
-export interface ApiError {
-  error: {
-    code: string;
-    message: string;
-    details?: Record<string, string[]>; // Field-specific errors
-    statusCode: number;
-  };
-}
-
-/**
- * API success response (for operations without data)
- * E.g., delete, update confirmation
- */
-export interface ApiSuccess {
+export interface ApiStatusResponse {
+  code: number;
   success: boolean;
   message?: string;
 }
 
+export interface FilterParams {
+  field: string;
+  operator: "eq" | "ne" | "lt" | "lte" | "gt" | "gte" | "btw";
+  value: string | number | boolean | [string, string] | [string, string];
+}
 /**
  * Search/filter parameters (generic)
  */
 export interface SearchParams extends PaginationParams {
-  query?: string;
-  filters?: Record<string, string | number | boolean>;
+  filters?: FilterParams[];
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 /**

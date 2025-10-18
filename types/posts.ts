@@ -24,6 +24,7 @@ export enum Amenity {
   PRIVATE_BATHROOM = "private-bathroom",
   TV = "tv",
 }
+
 export enum Utility {
   WIFI = "wifi",
   WATER = "water",
@@ -36,35 +37,38 @@ export interface LeaseTerm {
   endDate: Date;
 }
 
-// Base post interface - common fields for all post types
+// ============================================
+// API Response Types (What backend returns)
+// ============================================
+
+/**
+ * Base post interface - returned from API
+ * Contains all fields including server-generated ones
+ */
 export interface BasePost {
-  // Identification
+  // Server-generated fields
   id: string;
-
-  // Content
-  title: string;
-  content: string; // Full detailed content/body
-  author: PostAuthor; // Reference to PostAuthor type from users.ts
-  images?: string[]; // Array of image URLs
-
+  createdAt: Date;
+  updatedAt: Date;
+  author: PostAuthor;
   stats: {
     views: number;
     likes: number;
     stars: number;
     replies: number;
   };
-  // Categorization
+
+  // User-provided fields
+  title: string;
+  content: string;
   category: PostCategory;
-
-  // Dates
-  createdAt: Date;
-  updatedAt: Date;
-
-  // Status
   status: PostStatus;
+  images?: string[];
 }
 
-// Housing Request specific interface
+/**
+ * Housing Request post (from API)
+ */
 export interface HousingRequestPost extends BasePost {
   category: PostCategory.HOUSING_REQUEST;
 
@@ -80,36 +84,65 @@ export interface HousingRequestPost extends BasePost {
 
   // Utilities
   // preferredUtilities?: Utility[];
-
-  // Household & Poster Info
-  // numberOfRoommates?: number;
-  // posterGender?: "male" | "female" | "other";
-
-  // Location
-  // location: {
-  //   address?: string;
-  //   city: string;
-  //   province: string;
-  //   postalCode?: string;
-  //   country: string;
-  //   coordinates?: {
-  //     lat: number;
-  //     lng: number;
-  //   };
-  // };
 }
 
-// Sublet specific interface
 export interface SubletPost extends BasePost {
   category: PostCategory.SUBLET;
-
-  // Specific fields for sublets
-  // bedrooms: number;
-  // bathrooms: number;
-  // roomSize?: number;
-  // amenities?: Amenity[]; // e.g., ["parking", "laundry", "gym", "pool"]
-  // petPolicy?: boolean;
-  // utilities?: Utility[];
-  // leaseTerm?: LeaseTerm;
-  // genderPreference?: "male" | "female" | "other";
 }
+/**
+ * Data required to CREATE a new post
+ * Does NOT include server-generated fields (id, dates, stats, author)
+ */
+export interface CreatePostInput {
+  title: string;
+  content: string;
+  category: PostCategory;
+  images?: string[];
+}
+
+/**
+ * Data to UPDATE an existing post
+ * All fields are optional (partial update)
+ */
+export interface UpdatePostInput {
+  title?: string;
+  content?: string;
+  status?: PostStatus;
+  images?: string[];
+  // Note: category usually can't be changed after creation
+}
+
+/**
+ * Create housing request post
+ */
+export interface CreateHousingRequestInput extends CreatePostInput {
+  category: PostCategory.HOUSING_REQUEST;
+  // Future fields:
+  // leaseTerm?: LeaseTerm;
+  // maxBudget?: number;
+  // minBudget?: number;
+}
+
+/**
+ * Create sublet post
+ */
+export interface CreateSubletInput extends CreatePostInput {
+  category: PostCategory.SUBLET;
+  // Future fields:
+  // bedrooms?: number;
+  // bathrooms?: number;
+  // leaseTerm?: LeaseTerm;
+}
+
+// ============================================
+// Helper Type: Post without server fields
+// ============================================
+
+/**
+ * Utility type: Post data without server-generated fields
+ * Useful for forms and drafts
+ */
+export type PostFormData = Omit<
+  BasePost,
+  "id" | "createdAt" | "updatedAt" | "author" | "stats"
+>;
