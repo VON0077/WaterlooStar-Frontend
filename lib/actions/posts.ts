@@ -31,29 +31,27 @@ async function getAuthToken(): Promise<string | undefined> {
 // ============================================
 
 /**
- * Create post from form submission
+ * Create post action (flexible - works with any component structure)
  * Benefits:
- * - Automatic form handling (no need for onSubmit)
  * - Auth token from cookies (not exposed to client)
  * - Automatic revalidation
- * - Type-safe form data
+ * - Type-safe input
+ * - Can be called from anywhere (forms, buttons, multiple components)
  *
- * Usage in component:
- * <form action={createPostAction}>
- *   <input name="title" />
- *   <textarea name="content" />
- *   <button type="submit">Create</button>
- * </form>
+ * Usage examples:
+ *
+ * 1. From button/event handler:
+ *   const handleCreate = () => createPostAction({ title, content, category, images })
+ *
+ * 2. From native form (with wrapper):
+ *   <form action={createPostFromForm}>...</form>
+ *
+ * 3. With useTransition for loading states:
+ *   startTransition(() => createPostAction(data))
  */
-export async function createPostAction(formData: FormData) {
-  // Get data from form
-  const title = formData.get("title") as string;
-  const content = formData.get("content") as string;
-  const images = formData.get("images") as unknown as string[];
-  const category = formData.get("category") as PostCategory;
-
+export async function createPostAction(input: CreatePostInput) {
   // Validate
-  if (!title || !content || !category) {
+  if (!input.title || !input.content || !input.category) {
     return { error: "All fields are required" };
   }
 
@@ -63,14 +61,17 @@ export async function createPostAction(formData: FormData) {
     redirect("/login");
   }
 
-  const data = {
-    title,
-    content,
-    category,
-    images: [],
-  } as CreatePostInput;
+  try {
+    const response = await createPost(input, authToken);
 
-  const response = await createPost(data, authToken);
+    // Revalidate the feed page to show new post
+    revalidatePath(`/${input.category}/feed`);
+
+    return { success: true, data: response };
+  } catch (error) {
+    console.error("Create post error:", error);
+    return { error: "Failed to create post" };
+  }
 }
 
 /**
