@@ -5,6 +5,7 @@ import {
   NavbarMenuToggle,
   NavbarBrand,
   NavbarItem,
+  NavbarMenuItem,
 } from "@heroui/navbar";
 import { Button } from "@heroui/button";
 import { Kbd } from "@heroui/kbd";
@@ -65,6 +66,11 @@ export const Navbar = () => {
         <NavbarItem className="hidden sm:flex gap-2">
           <ThemeSwitch />
         </NavbarItem>
+        <NavbarItem className="hidden sm:flex">
+          <Button as={NextLink} color="primary" href="/login" variant="flat">
+            Log in
+          </Button>
+        </NavbarItem>
       </NavbarContent>
 
       {/* Mobile menu */}
@@ -74,7 +80,20 @@ export const Navbar = () => {
       </NavbarContent>
 
       {/* use navbarmenuitem */}
-      <NavbarMenu>{searchInput}</NavbarMenu>
+      <NavbarMenu>
+        {searchInput}
+        <NavbarMenuItem className="mt-4">
+          <Button
+            as={NextLink}
+            color="primary"
+            fullWidth
+            href="/login"
+            variant="flat"
+          >
+            Log in
+          </Button>
+        </NavbarMenuItem>
+      </NavbarMenu>
     </HeroUINavbar>
   );
 };
