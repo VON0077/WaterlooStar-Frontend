@@ -26,12 +26,12 @@ export const sidebarConfig = {
       items: [
         {
           label: "Housing Requests",
-          href: "/housing-request/feed",
+          href: "/housing-request",
           description: "Find and share housing requests",
         },
         {
           label: "Sublets",
-          href: "/sublet/feed",
+          href: "/sublet",
           description: "Find and share sublets",
         },
       ],
